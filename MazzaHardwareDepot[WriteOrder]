@@ -1,0 +1,50 @@
+package edu.cpt187.mazza.exercise6;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class WriteOrder 
+{//BEGIN CLASS
+	//AUTHOR:NICK MAZZA
+	//CLASS: CPT 187
+	//PURPOSE: This writes on the file, or creates a new one 
+	//CREATEDATE: 12/2/2020
+	//attributes
+	private boolean fileFoundFlag;
+	private String masterFileName="";
+	private int recordCount=0;
+	//constructor
+	WriteOrder(String borrowedFileName)
+	{
+		masterFileName=borrowedFileName;
+	}
+	public void setWriteOrder(int borrowedItemID, String borrowedItemName, double borrowedItemPrice, int borrowedQuantity, double borrowedOrderCost)
+	{//BEGIN sWRITE
+		try
+		{//BEGIN try
+			PrintWriter filePW = new PrintWriter(new FileWriter(masterFileName, true));
+			filePW.printf("%n%d\t%s\t%f\t%d\t%f", borrowedItemID, borrowedItemName, borrowedItemPrice, borrowedQuantity, borrowedOrderCost);
+			fileFoundFlag=true;
+			recordCount++;
+			filePW.close();
+		}//END try
+		catch (IOException ex)
+		{//BEGIN catch
+			fileFoundFlag=false;
+		}//END catch
+	}//END sWRITE
+	public boolean getFileFoundFlag()
+	{//BEGIN gfff
+		return fileFoundFlag;
+	}//END gfff
+	public String getFileName()
+	{//BEGIN gFILENAME
+		return masterFileName;
+	}//END gFILENAME
+	public int getRecordCount()
+	{//BEGIN greccount
+		return recordCount;
+	}//end greccount
+
+}//END CLASS
