@@ -1,0 +1,254 @@
+package edu.cpt187.mazza.exercise6;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Inventory 
+{//BEGIN CLASS
+	//AUTHOR:NICK MAZZA
+	//CLASS: CPT 187
+	//PURPOSE: The inventory keeps track of the file contents
+	//CREATEDATE: 12/2/2020
+	//attributes
+	private final String[] DISCOUNT_NAMES= {"Member", "Senior", "No Discount"};
+	private final double[] DISCOUNT_RATES= {0.25,0.15,0.0};
+	private final String[] PRIZE_NAMES= {"Deed to the Hardware Store","A stolen copy of Fight Club","A 6lb. bag of uncooked shrimp"};
+	private final int MAX_RECORDS=45;
+	private final int NOT_FOUND=-1;
+	private final int ONE=1;
+	private final int RESET_VALUE=0;
+	private int[] itemIDs= new int[MAX_RECORDS];
+	private String[] itemNames= new String[MAX_RECORDS];
+	private double[] itemPrices= new double[MAX_RECORDS];
+	private int[] orderQuantities= new int[MAX_RECORDS];
+	private double[] orderTotals= new double[MAX_RECORDS];
+	private int[] inStockCounts= new int[MAX_RECORDS];
+	private int itemSearchIndex=0;
+	private int recordCount=0;
+	private Random prizeGenerator= new Random();
+	//constructor
+	Inventory()
+	{
+	}
+	//behaviors
+	public void setReduceStock(int borrowedHowMany)
+	{//BEGIN sREDSTO
+		inStockCounts[itemSearchIndex]=inStockCounts[itemSearchIndex]-borrowedHowMany;
+	}//END sREDSTO
+	public void setLoadItems (String borrowedFileName)
+	{//BEGIN sLOADITEM
+		//read
+		try
+		{//BEGIN TRY
+			Scanner infile = new Scanner (new FileInputStream(borrowedFileName));
+			recordCount=RESET_VALUE;
+			while (infile.hasNext()==true && recordCount < MAX_RECORDS)
+			{//BEGIN TRYWHILE
+				itemIDs[recordCount]= infile.nextInt();
+				itemNames[recordCount]= infile.next();
+				itemPrices[recordCount]= infile.nextDouble();
+				inStockCounts[recordCount]=infile.nextInt();
+				recordCount++;
+			}//END TRYWHILE
+			infile.close();
+			setBubbleSort();
+		}//END TRY
+		catch (IOException ex)
+		{//BEGIN CATCH
+			recordCount=NOT_FOUND;
+		}//END CATCH
+	}//END sLOADITEM
+	public void setLoadItems(String borrowedFileName, int borrowedSize)
+	{//BEGIN sLOADITEM2
+		//read
+		try
+		{//BEGIN TRY
+			Scanner infile = new Scanner (new FileInputStream(borrowedFileName));
+			recordCount=RESET_VALUE;
+			while (infile.hasNext()==true && recordCount < MAX_RECORDS && borrowedSize<MAX_RECORDS)
+			{//BEGIN TRYWHILE
+				itemIDs[recordCount]= infile.nextInt();
+				itemNames[recordCount]= infile.next();
+				itemPrices[recordCount]= infile.nextDouble();
+				orderQuantities[recordCount]=infile.nextInt();
+				orderTotals[recordCount]=infile.nextDouble();
+				recordCount++;
+			}//END TRYWHILE
+			infile.close();
+			setBubbleSort();
+		}//END TRY
+		catch (IOException ex)
+		{//BEGIN CATCH
+			recordCount=NOT_FOUND;
+		}//END CATCH
+	}//END sLOADITEM2
+	public void setSearchIndex(int borrowedID)
+	{//BEGIN sSEARCHIND
+		itemSearchIndex=getSearchResults(borrowedID);
+	}//END sSEARCHIND
+	public void setBubbleSort()
+	{//BEGIN sBUBBLE
+		//localvar
+		int localLast=0;
+		int localIndex=0;
+		boolean localSwap=false;
+		//read
+		localLast=recordCount-ONE;
+		while(localLast> 0) 
+		{//BEGIN BUBBLEWHILE
+			localIndex=RESET_VALUE;
+			localSwap=false;
+			while ( localIndex<localLast)
+			{//BEGIN bubble2
+				if (itemIDs[localIndex]>itemIDs[localIndex+ONE])
+				{//BEGIN ifarray
+					setSwapArrayElements(localIndex);
+					localSwap=true;
+				}//END ifarray
+				localIndex++;
+			}//END bubble2
+			if (localSwap==false)
+			{//BEGIN falseswap
+				localLast=RESET_VALUE;
+			}//END falseswap
+			else
+			{//BEGIN else
+				localLast--;
+			}//END else
+		}//END BUBBLEWHILE
+	}//END sBUBBLE
+	public void setSwapArrayElements(int borrowedIndex)
+	{//BEGIN sSAE
+		int localItemID=RESET_VALUE;
+		String localName="";
+		double localPrice=0.0;
+		int localStock=RESET_VALUE;
+		int localMany=RESET_VALUE;
+		double localTotal=0.0;
+		//read
+		localItemID = itemIDs[borrowedIndex];  
+		itemIDs[borrowedIndex] = itemIDs[borrowedIndex+ONE];
+		itemIDs[borrowedIndex+ONE] = localItemID;
+
+		localName=itemNames[borrowedIndex];
+		itemNames[borrowedIndex]=itemNames[borrowedIndex+ONE];
+		itemNames[borrowedIndex+ONE]=localName;
+
+		localPrice=itemPrices[borrowedIndex];
+		itemPrices[borrowedIndex]=itemPrices[borrowedIndex+ONE];
+		itemPrices[borrowedIndex+ONE]=localPrice;
+
+		localStock=inStockCounts[borrowedIndex];
+		inStockCounts[borrowedIndex]=inStockCounts[borrowedIndex+ONE];
+		inStockCounts[borrowedIndex+ONE]=localStock;
+		
+		localMany=orderQuantities[borrowedIndex];
+		orderQuantities[borrowedIndex]=orderQuantities[borrowedIndex+ONE];
+		orderQuantities[borrowedIndex+ONE]=localMany;
+		
+		localTotal=orderTotals[borrowedIndex];
+		orderTotals[borrowedIndex]=orderTotals[borrowedIndex+ONE];
+		orderTotals[borrowedIndex+ONE]=localTotal;
+	}//END sSAE
+	public int[] getInStockCounts()
+	{//BEGIN gISC
+		return inStockCounts;
+	}//END gISC
+	public int[] getItemIDs()
+	{//BEGIN gITID
+		return itemIDs;
+	}//END gITID
+	public String[] getItemNames()
+	{//BEGIN gitemname
+		return itemNames;
+	}//END gitemname
+	public double[] getItemPrices()
+	{//BEGIN gITEMPRI
+		return itemPrices;
+	}//END gITEMPRI
+	public String[] getDiscountNames()
+	{//BEGIN gdisname
+		return DISCOUNT_NAMES;
+	}//end gdisname
+	public double[] getDiscountRates()
+	{//BEGIN gdisrates
+		return DISCOUNT_RATES;
+	}//END gdisrates
+	public int[] getOrderQuantities()
+	{//BEGIN gORDQUA
+		return orderQuantities;
+	}//END gORDQAU
+	public double[] getOrderTotals()
+	{//BEGIN gORDTOT
+		return orderTotals;
+	}//END gORDTOT
+	public String[] getPrizeNames()
+	{//BEGIN gPRIZNM
+		return PRIZE_NAMES;
+	}//END gPRIZNM
+	public int getRandomNumber()
+	{//BEGIN gRANDNUM
+		return prizeGenerator.nextInt(PRIZE_NAMES.length);
+	}//END gRANDNUM
+	public int getMaxRecords()
+	{//BEGIN gmaxrec
+		return MAX_RECORDS;
+	}//end gmaxrec
+	public int getItemSearchIndex()
+	{//BEGIN gISI
+		return itemSearchIndex;
+	}//END gISI
+	public int getRecordCount()
+	{//BEGIN greccoun
+		return recordCount;
+	}//end grecoun
+	public double getGrandTotal()
+	{//BEGIN ggrantot
+		//local var
+		int localIndex=0;
+		double localGrand=0.0;
+		while (localIndex<orderTotals.length)
+		{//BEGIN grandwhile
+			localGrand=localGrand+orderTotals[localIndex];
+			localIndex++;
+		}//END grandwhile
+		return  localGrand;
+	}//END ggrandtot
+	public int getSearchResults(int borrowedBorrowedID)
+	{//BEGIN gsearres
+		//local var
+		final int TWO=2;
+		int localLast=0;
+		int localFirst=0;
+		int localMid=0;
+		boolean localFound=false;
+		//read
+		localLast=recordCount-ONE;
+		while (localFirst<=localLast && localFound==false)
+		{//BEGIN searchwhile
+			localMid=(localFirst+localLast)/TWO;
+			if (itemIDs[localMid]==borrowedBorrowedID)
+			{//BEGIN ifsearch1
+				localFound=true;
+			}//END ifsearch1
+			else
+			{//BEGIN else
+				if (itemIDs[localMid]<borrowedBorrowedID)
+				{//BEGIN anotheriif
+					localFirst=localMid+ONE;
+				}//END anotheriif
+				else
+				{//BEGIN else2
+					localLast=localMid-ONE;
+				}//END else2
+			}//BEGINelse
+		}//END searchwhile
+		if (localFound==false)
+		{//BEGIN ifnotfound
+			localMid=NOT_FOUND;
+		}//END ifnotfound
+		return localMid;
+	}//END gsearres
+}//END CLASS
